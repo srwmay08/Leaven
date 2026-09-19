@@ -1,0 +1,60 @@
+<!-- frontend/ingredients.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MaykeryOS - Ingredient Costs</title>
+    <link rel="stylesheet" href="css/main.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Ingredient Cost Database</h1>
+        </header>
+
+        <!-- Data Capture Form -->
+        <section class="form-section">
+            <h2>Add New Ingredient Purchase</h2>
+            <form id="ingredient-form">
+                <div class="form-group">
+                    <label for="item-name">Item</label>
+                    <input type="text" id="item-name" required placeholder="e.g., Almond Milk">
+                </div>
+                
+                <div class="form-group">
+                    <label for="item-cost">Total Cost ($)</label>
+                    <!-- Changed step from 0.01 to any to allow values like .0037 -->
+                    <input type="number" id="item-cost" step="any" required placeholder="0.0037">
+                </div>
+
+                <div class="form-group">
+                    <label for="item-grams">Grams Equivalent</label>
+                    <input type="number" id="item-grams" step="any" required placeholder="3785">
+                </div>
+                
+                <button type="submit" class="btn-primary">Save to Ledger</button>
+            </form>
+        </section>
+
+        <!-- Spreadsheet Replacement Table -->
+        <section class="table-section">
+            <table id="ingredients-table">
+                <thead>
+                    <tr>
+                        <th>Item</th>
+                        <th>Total Cost</th>
+                        <th>Grams Equivalent</th>
+                        <th>$/G</th>
+                    </tr>
+                </thead>
+                <tbody id="ingredients-tbody">
+                    <!-- Rows will be populated by JavaScript -->
+                </tbody>
+            </table>
+        </section>
+    </div>
+    
+    <script src="js/ingredients.js"></script>
+</body>
+</html>

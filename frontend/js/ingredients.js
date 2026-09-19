@@ -57,3 +57,18 @@ function renderTable() {
 
 // Initial render (this would normally be a GET request to fetch existing DB records)
 renderTable();
+
+// Fetch data from the database on page load
+document.addEventListener('DOMContentLoaded', async () => {
+    try {
+        const response = await fetch('http://localhost:8000/api/ingredients/');
+        if (response.ok) {
+            ingredientsData = await response.json();
+            renderTable();
+        } else {
+            console.error("Failed to fetch ingredients");
+        }
+    } catch (error) {
+        console.error("Connection error:", error);
+    }
+});

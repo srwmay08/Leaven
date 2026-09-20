@@ -1,18 +1,10 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from contextlib import asynccontextmanager
-from fastapi.staticfiles import StaticFiles # 1. Import StaticFiles
+from fastapi.staticfiles import StaticFiles
 
 from core.database import connect_to_mongo, close_mongo_connection
-from routers import ingredients, recipes, markets
-
-# backend/routers/recipes.py
-from fastapi import APIRouter
-router = APIRouter()
-
-# backend/routers/markets.py
-from fastapi import APIRouter
-router = APIRouter()
+from routers import ingredients, recipes, markets, receipts, expenses
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
@@ -28,6 +20,7 @@ app = FastAPI(
 origins = [
     "http://localhost",
     "http://localhost:8000",
+    "http://127.0.0.1:8000",
 ]
 
 app.add_middleware(
@@ -38,12 +31,10 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# 2. Register API routers FIRST
 app.include_router(ingredients.router, prefix="/api/ingredients", tags=["Ingredients"])
 app.include_router(recipes.router, prefix="/api/recipes", tags=["Recipes"])
 app.include_router(markets.router, prefix="/api/markets", tags=["Markets"])
+app.include_router(receipts.router, prefix="/api/receipts", tags=["Receipts"])
+app.include_router(expenses.router, prefix="/api/expenses", tags=["Expenses"])
 
-# 3. Mount the frontend directory LAST
-# The path "../frontend" assumes your terminal is running from inside the /backend directory.
-# html=True tells FastAPI to automatically serve index.html when you visit the root URL.
 app.mount("/", StaticFiles(directory="../frontend", html=True), name="frontend")

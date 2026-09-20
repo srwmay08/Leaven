@@ -4,56 +4,297 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>MaykeryOS - Dashboard</title>
-    <link rel="stylesheet" href="css/main.css">
-    <style>
-        .dashboard-nav {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 20px;
-            margin-top: 20px;
-        }
-        .nav-card {
-            background: var(--bg-color);
-            padding: 20px;
-            border-radius: 6px;
-            border: 1px solid var(--border-color);
-            text-align: center;
-            text-decoration: none;
-            color: var(--primary-color);
-            font-weight: 600;
-            transition: transform 0.2s, box-shadow 0.2s;
-        }
-        .nav-card:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
-            border-color: var(--accent-color);
-        }
-    </style>
+    <link rel="stylesheet" href="/css/main.css?v=6">
 </head>
 <body>
     <div class="container">
         <header>
-            <h1>MaykeryOS Dashboard</h1>
+            <h1>MaykeryOS</h1>
             <p>Production, Costing, and Storefront Management</p>
+            
+            <nav class="tabs">
+                <button class="tab-btn active" data-target="dashboard-view">Dashboard</button>
+                <button class="tab-btn" data-target="ingredients-view">Ingredients</button>
+                <button class="tab-btn" data-target="recipes-view">Recipes</button>
+                <button class="tab-btn" data-target="markets-view">Markets</button>
+                <button class="tab-btn" data-target="expenses-view">Expense Ledger</button>
+            </nav>
         </header>
 
-        <section class="dashboard-nav">
-            <a href="/ingredients.html" class="nav-card">
-                <h3>Ingredient Ledger</h3>
-                <p>Log bulk purchases and track average cost-per-gram.</p>
-            </a>
-            
-            <a href="/recipes.html" class="nav-card">
-                <h3>Recipe & COGS Calculator</h3>
-                <p>Build formulas and project profit margins.</p>
-            </a>
+        <main id="app-content">
+            <!-- DASHBOARD VIEW -->
+            <section id="dashboard-view" class="view active">
+                <div class="dashboard-nav">
+                    <div class="nav-card tab-trigger" data-target="ingredients-view">
+                        <h3>Ingredient Catalog</h3>
+                        <p>Manage ingredient costs and gram equivalents.</p>
+                    </div>
+                    <div class="nav-card tab-trigger" data-target="recipes-view">
+                        <h3>Recipe & COGS Calculator</h3>
+                        <p>Build formulas and project profit margins.</p>
+                    </div>
+                    <div class="nav-card tab-trigger" data-target="markets-view">
+                        <h3>Market Profitability</h3>
+                        <p>Project revenue, packaging costs, and net profit.</p>
+                    </div>
+                    <div class="nav-card tab-trigger" data-target="expenses-view">
+                        <h3>Expense Ledger</h3>
+                        <p>Track ingredient and equipment purchases for taxes.</p>
+                    </div>
+                </div>
+            </section>
 
-            <a href="/markets.html" class="nav-card">
-                <h3>Market Profitability</h3>
-                <p>Project revenue, packaging costs, and net profit per event.</p>
-            </a>
-            
-        </section>
+            <!-- INGREDIENTS VIEW -->
+            <section id="ingredients-view" class="view hidden">
+                <h2>Ingredient Cost Database</h2>
+                
+                <section class="form-section" style="background: #e3f2fd; border: 1px solid #90caf9;">
+                    <h3>Import from Receipt (PDF)</h3>
+                    <div class="form-group" style="flex-direction: row; gap: 10px; align-items: center;">
+                        <input type="file" id="receipt-upload" accept="application/pdf" style="background: white;">
+                        <button id="upload-receipt-btn" class="btn-primary">Scan Receipt</button>
+                    </div>
+
+                    <div id="receipt-review-section" class="hidden" style="margin-top: 20px;">
+                        <h4>Review & Select Items</h4>
+                        <table style="background: white;">
+                            <thead>
+                                <tr>
+                                    <th>Import?</th>
+                                    <th>Item Name</th>
+                                    <th>Total Price</th>
+                                    <th>Receipt Qty</th>
+                                    <th>Items / Pack</th>
+                                    <th>Grams per Item</th>
+                                </tr>
+                            </thead>
+                            <tbody id="receipt-review-tbody">
+                            </tbody>
+                        </table>
+                        <button id="confirm-import-btn" class="btn-primary full-width margin-top-md" style="background-color: #27ae60;">Confirm & Add to Ingredients</button>
+                    </div>
+                </section>
+
+                <section class="form-section">
+                    <h3>Add/Edit Ingredient (Manual)</h3>
+                    <form id="ingredient-form">
+                        <div class="form-group">
+                            <label for="item-name">Item Name</label>
+                            <input type="text" id="item-name" required placeholder="e.g., Almond Milk">
+                        </div>
+                        <div class="form-group">
+                            <label for="item-cost">Cost per Unit ($)</label>
+                            <input type="number" id="item-cost" step="any" required placeholder="16.96">
+                        </div>
+                        <div class="form-group">
+                            <label for="item-grams">Grams per Unit</label>
+                            <input type="number" id="item-grams" step="any" required placeholder="11339.8">
+                        </div>
+                        <button type="submit" class="btn-primary">Save Ingredient</button>
+                    </form>
+                </section>
+
+                <section class="table-section">
+                    <table id="ingredients-table">
+                        <thead>
+                            <tr>
+                                <th>Item</th>
+                                <th>Unit Cost</th>
+                                <th>Grams</th>
+                                <th>$/G</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="ingredients-tbody">
+                        </tbody>
+                    </table>
+                </section>
+            </section>
+
+            <!-- EXPENSE LEDGER VIEW -->
+            <section id="expenses-view" class="view hidden">
+                <h2>Tax & Expense Ledger</h2>
+                
+                <section class="form-section">
+                    <h3>Record New Expense</h3>
+                    <form id="expense-form">
+                        <div style="display: grid; grid-template-columns: 1fr 2fr 1fr 1fr; gap: 15px; align-items: end;">
+                            <div class="form-group">
+                                <label for="expense-date">Date</label>
+                                <input type="date" id="expense-date" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="expense-name">Item / Description</label>
+                                <input type="text" id="expense-name" required placeholder="e.g., Stand Mixer">
+                            </div>
+                            <div class="form-group">
+                                <label for="expense-category">Category</label>
+                                <select id="expense-category" style="padding: 10px; border-radius: 4px; border: 1px solid var(--border-color);">
+                                    <option value="Ingredient">Ingredient</option>
+                                    <option value="Equipment">Equipment</option>
+                                    <option value="Packaging">Packaging</option>
+                                    <option value="Other">Other</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label for="expense-cost">Total Cost ($)</label>
+                                <input type="number" id="expense-cost" step="0.01" required>
+                            </div>
+                        </div>
+                        <button type="submit" class="btn-primary margin-top-md full-width">Log Expense</button>
+                    </form>
+                </section>
+
+                <section class="table-section">
+                    <table id="expenses-table">
+                        <thead>
+                            <tr>
+                                <th>Date</th>
+                                <th>Item Description</th>
+                                <th>Category</th>
+                                <th>Cost</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody id="expenses-tbody">
+                        </tbody>
+                    </table>
+                </section>
+            </section>
+
+            <!-- RECIPES VIEW -->
+            <section id="recipes-view" class="view hidden">
+                <h2>Recipe Calculator & COGS</h2>
+                
+                <!-- NEW: Saved Recipes Table -->
+                <section class="table-section" style="margin-bottom: 30px;">
+                    <h3>Saved Recipes</h3>
+                    <table id="saved-recipes-table">
+                        <thead>
+                            <tr>
+                                <th>Recipe Name</th>
+                                <th>Batch Yield</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="saved-recipes-tbody">
+                            <!-- Populated by JS -->
+                        </tbody>
+                    </table>
+                </section>
+
+                <hr style="border: 1px solid var(--border-color); margin-bottom: 30px;">
+
+                <section class="form-section">
+                    <h3>Create / Edit Recipe</h3>
+                    <div class="recipe-header-grid">
+                        <div class="form-group">
+                            <label for="recipe-name">Recipe Name</label>
+                            <input type="text" id="recipe-name" placeholder="e.g., Cinnamon Cardamom Bread">
+                        </div>
+                        <div class="form-group">
+                            <label for="yield-qty">Quantity Made (Batch Yield)</label>
+                            <input type="number" id="yield-qty" min="1" value="4">
+                        </div>
+                    </div>
+                </section>
+
+                <section class="table-section">
+                    <table id="recipe-ingredients-table">
+                        <thead>
+                            <tr>
+                                <th>Ingredient</th>
+                                <th>Grams Used</th>
+                                <th>Cost ($/G)</th>
+                                <th>Line Cost</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody id="recipe-tbody">
+                        </tbody>
+                    </table>
+                    <button id="add-ingredient-btn" class="btn-secondary">+ Add Ingredient</button>
+                    <button id="clear-recipe-btn" class="btn-secondary" style="margin-left: 10px;">Clear Form</button>
+                </section>
+
+                <section class="form-section summary-grid">
+                    <div>
+                        <h3>Costing Summary</h3>
+                        <p>Cost per Batch: <strong id="batch-cost">$0.00</strong></p>
+                        <p>Cost per Unit (COGS): <strong id="unit-cost">$0.00</strong></p>
+                    </div>
+                    <div>
+                        <h3>Profit Margin Projection</h3>
+                        <div class="form-group margin-bottom-sm">
+                            <label for="sale-price">Sale Price ($)</label>
+                            <input type="number" id="sale-price" step="0.01" value="9.00">
+                        </div>
+                        <div class="form-group margin-bottom-sm">
+                            <label for="packaging-cost">Packaging Cost ($)</label>
+                            <input type="number" id="packaging-cost" step="0.01" value="0.00">
+                        </div>
+                        <div class="form-group margin-bottom-md">
+                            <label for="taxes">Taxes ($)</label>
+                            <input type="number" id="taxes" step="0.01" value="0.72">
+                        </div>
+                        <p class="profit-highlight"><strong>Estimated Profit: <span id="estimated-profit">$0.00</span></strong></p>
+                    </div>
+                </section>
+                <button id="save-recipe-btn" class="btn-primary full-width">Save Recipe to Database</button>
+            </section>
+
+            <!-- MARKETS VIEW -->
+            <section id="markets-view" class="view hidden">
+                <h2>Event Ledger & Profitability</h2>
+                
+                <section class="form-section">
+                    <div class="event-header-grid">
+                        <div class="form-group">
+                            <label>Event Name</label>
+                            <input type="text" id="event-name" required placeholder="e.g., OkTupperFest">
+                        </div>
+                        <div class="form-group">
+                            <label>Event Date</label>
+                            <input type="date" id="event-date" required>
+                        </div>
+                    </div>
+                    
+                    <table id="market-table">
+                        <thead>
+                            <tr>
+                                <th>Item</th>
+                                <th>Qty Made</th>
+                                <th>Qty Sold</th>
+                                <th>Revenue</th>
+                                <th>Cost (Made)</th>
+                                <th>Net Profit</th>
+                            </tr>
+                        </thead>
+                        <tbody id="market-tbody">
+                        </tbody>
+                        <tfoot>
+                            <tr class="table-totals">
+                                <td>Totals</td>
+                                <td id="total-made">0</td>
+                                <td id="total-sold">0</td>
+                                <td id="total-revenue">$0.00</td>
+                                <td id="total-cost">$0.00</td>
+                                <td id="total-profit" class="profit-text">$0.00</td>
+                            </tr>
+                        </tfoot>
+                    </table>
+                    
+                    <button id="save-event-btn" class="btn-primary full-width margin-top-md">Save Event to Ledger</button>
+                    <p id="save-status" class="status-message"></p>
+                </section>
+            </section>
+        </main>
     </div>
+
+    <script src="/js/app.js"></script>
+    <script src="/js/ingredients.js"></script>
+    <script src="/js/expenses.js"></script>
+    <script src="/js/recipes.js"></script>
+    <script src="/js/markets.js"></script>
 </body>
 </html>

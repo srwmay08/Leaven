@@ -1,4 +1,3 @@
-# backend/routers/markets.py
 from fastapi import APIRouter
 from models.market import MarketEvent
 from core.database import get_database

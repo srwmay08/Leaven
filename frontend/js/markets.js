@@ -1,5 +1,3 @@
-// frontend/js/markets.js
-
 const products = {
     hc_loaf: { name: "Herbes & Cheddar Loaf", price: 12.00, cogs: 2.17, packaging: 0.15, tax_rate: 0.08 },
     cc_loaf: { name: "Cinnamon Cardamom Loaf", price: 9.00, cogs: 1.25, packaging: 0.15, tax_rate: 0.08 },
@@ -11,10 +9,11 @@ const products = {
     vcc_cookie: { name: "Vegan CC Pack", price: 5.00, cogs: 0.70, packaging: 0.13, tax_rate: 0.08 }
 };
 
-const tbody = document.getElementById('market-tbody');
+const marketTbody = document.getElementById('market-tbody');
 let currentTotals = {};
 
 function initTable() {
+    marketTbody.innerHTML = '';
     for (const [key, p] of Object.entries(products)) {
         const tr = document.createElement('tr');
         tr.innerHTML = `
@@ -25,10 +24,9 @@ function initTable() {
             <td class="row-cost">$0.00</td>
             <td class="row-profit"><strong>$0.00</strong></td>
         `;
-        tbody.appendChild(tr);
+        marketTbody.appendChild(tr);
     }
     
-    // Add event listeners to recalculate when any number changes
     document.querySelectorAll('.table-input').forEach(input => {
         input.addEventListener('input', calculateLedger);
     });
@@ -37,7 +35,7 @@ function initTable() {
 function calculateLedger() {
     let totals = { made: 0, sold: 0, revenue: 0, cost: 0, profit: 0, items: [] };
 
-    tbody.querySelectorAll('tr').forEach(tr => {
+    marketTbody.querySelectorAll('tr').forEach(tr => {
         const madeInput = tr.querySelector('.qty-made');
         const soldInput = tr.querySelector('.qty-sold');
         const key = madeInput.getAttribute('data-key');
@@ -46,13 +44,11 @@ function calculateLedger() {
         const soldQty = parseInt(soldInput.value) || 0;
         const p = products[key];
 
-        // Core Business Logic: Costs are based on Made, Revenue is based on Sold
         const cost = madeQty * (p.cogs + p.packaging);
         const rev = soldQty * p.price;
         const tax = rev * p.tax_rate;
         const profit = rev - cost - tax;
 
-        // Update Row UI
         tr.querySelector('.row-rev').innerText = `$${rev.toFixed(2)}`;
         tr.querySelector('.row-cost').innerText = `$${cost.toFixed(2)}`;
         tr.querySelector('.row-profit').innerHTML = `<strong>$${profit.toFixed(2)}</strong>`;
@@ -68,7 +64,6 @@ function calculateLedger() {
         totals.profit += profit;
     });
 
-    // Update Footer UI
     document.getElementById('total-made').innerText = totals.made;
     document.getElementById('total-sold').innerText = totals.sold;
     document.getElementById('total-revenue').innerText = `$${totals.revenue.toFixed(2)}`;
@@ -78,7 +73,6 @@ function calculateLedger() {
     currentTotals = totals;
 }
 
-// Handle Saving to Database
 document.getElementById('save-event-btn').addEventListener('click', async () => {
     const eventName = document.getElementById('event-name').value;
     const eventDate = document.getElementById('event-date').value;
@@ -98,7 +92,7 @@ document.getElementById('save-event-btn').addEventListener('click', async () => 
     };
 
     try {
-        const response = await fetch('http://localhost:8000/api/markets/', {
+        const response = await fetch('/api/markets/', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(payload)
@@ -115,5 +109,4 @@ document.getElementById('save-event-btn').addEventListener('click', async () => 
     }
 });
 
-// Initialize
 document.addEventListener('DOMContentLoaded', initTable);

@@ -6,7 +6,6 @@ class DataBase:
 db = DataBase()
 
 async def connect_to_mongo():
-    # In production, replace this string with an environment variable
     db.client = AsyncIOMotorClient("mongodb://localhost:27017")
     print("Connected to MongoDB.")
 

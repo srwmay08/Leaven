@@ -1,4 +1,3 @@
-# backend/models/market.py
 from pydantic import BaseModel
 from typing import List
 

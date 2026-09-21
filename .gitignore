@@ -1,16 +1,19 @@
-# Virtual Environments
-venv/
-env/
-.venv/
-
-# Compiled Python Files
+# Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
 *$py.class
 
-# Environment Variables / Secrets
+# Virtual Environments
+venv/
+.venv/
+env/
 .env
 
-# Local Databases
+# IDE / Editor folders
+.vscode/
+.idea/
+*.swp
+
+# SQLite Databases (if applicable)
 *.sqlite3
-*.db
+db.sqlite3

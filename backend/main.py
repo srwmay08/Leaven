@@ -17,15 +17,11 @@ app = FastAPI(
     lifespan=lifespan
 )
 
-origins = [
-    "http://localhost",
-    "http://localhost:8000",
-    "http://127.0.0.1:8000",
-]
-
+# Using a wildcard allows local network access (e.g., from a tablet on your Wi-Fi).
+# If deploying to production, replace "*" with your specific production domains.
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=origins,
+    allow_origins=["*"], 
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],

@@ -42,16 +42,13 @@
                         <p>Track ingredient and equipment purchases for taxes.</p>
                     </div>
                 </div>
-            </section>
 
-            <!-- INGREDIENTS VIEW -->
-            <section id="ingredients-view" class="view hidden">
-                <h2>Ingredient Cost Database</h2>
-                
-                <section class="form-section" style="background: #e3f2fd; border: 1px solid #90caf9;">
+                <section class="form-section" style="background: #e3f2fd; border: 1px solid #90caf9; margin-top: 30px;">
                     <h3>Import from Receipt (PDF)</h3>
                     <div class="form-group" style="flex-direction: row; gap: 10px; align-items: center;">
                         <input type="file" id="receipt-upload" accept="application/pdf" style="background: white;">
+                        <input type="date" id="receipt-date" required style="background: white; padding: 10px; border: 1px solid var(--border-color); border-radius: 4px;">
+                        <input type="text" id="receipt-vendor" placeholder="Vendor" required style="background: white; padding: 10px; border: 1px solid var(--border-color); border-radius: 4px;">
                         <button id="upload-receipt-btn" class="btn-primary">Scan Receipt</button>
                     </div>
 
@@ -65,15 +62,21 @@
                                     <th>Total Price</th>
                                     <th>Receipt Qty</th>
                                     <th>Items / Pack</th>
-                                    <th>Grams per Item</th>
+                                    <th>Unit Type</th>
+                                    <th>Total Units/Grams</th>
                                 </tr>
                             </thead>
                             <tbody id="receipt-review-tbody">
                             </tbody>
                         </table>
-                        <button id="confirm-import-btn" class="btn-primary full-width margin-top-md" style="background-color: #27ae60;">Confirm & Add to Ingredients</button>
+                        <button id="confirm-import-btn" class="btn-primary full-width margin-top-md" style="background-color: #27ae60;">Confirm & Add to Ledgers</button>
                     </div>
                 </section>
+            </section>
+
+            <!-- INGREDIENTS VIEW -->
+            <section id="ingredients-view" class="view hidden">
+                <h2>Ingredient Cost Database</h2>
 
                 <section class="form-section">
                     <h3>Add/Edit Ingredient (Manual)</h3>
@@ -83,12 +86,23 @@
                             <input type="text" id="item-name" required placeholder="e.g., Almond Milk">
                         </div>
                         <div class="form-group">
+                            <label for="item-vendor">Vendor</label>
+                            <input type="text" id="item-vendor" required placeholder="e.g., Sam's Club">
+                        </div>
+                        <div class="form-group">
                             <label for="item-cost">Cost per Unit ($)</label>
                             <input type="number" id="item-cost" step="any" required placeholder="16.96">
                         </div>
                         <div class="form-group">
-                            <label for="item-grams">Grams per Unit</label>
-                            <input type="number" id="item-grams" step="any" required placeholder="11339.8">
+                            <label for="item-units">Total Units / Grams</label>
+                            <input type="number" id="item-units" step="any" required placeholder="11339.8">
+                        </div>
+                        <div class="form-group">
+                            <label for="item-unit-type">Unit Type</label>
+                            <select id="item-unit-type" style="padding: 10px; border-radius: 4px; border: 1px solid var(--border-color);">
+                                <option value="g">Grams (g)</option>
+                                <option value="ea">Each (ea)</option>
+                            </select>
                         </div>
                         <button type="submit" class="btn-primary">Save Ingredient</button>
                     </form>
@@ -99,9 +113,10 @@
                         <thead>
                             <tr>
                                 <th>Item</th>
+                                <th>Vendor</th>
                                 <th>Unit Cost</th>
-                                <th>Grams</th>
-                                <th>$/G</th>
+                                <th>Total Units</th>
+                                <th>$/Unit</th>
                                 <th>Actions</th>
                             </tr>
                         </thead>
@@ -114,7 +129,6 @@
             <!-- EXPENSE LEDGER VIEW -->
             <section id="expenses-view" class="view hidden">
                 <h2>Tax & Expense Ledger</h2>
-                
                 <section class="form-section">
                     <h3>Record New Expense</h3>
                     <form id="expense-form">
@@ -165,8 +179,6 @@
             <!-- RECIPES VIEW -->
             <section id="recipes-view" class="view hidden">
                 <h2>Recipe Calculator & COGS</h2>
-                
-                <!-- NEW: Saved Recipes Table -->
                 <section class="table-section" style="margin-bottom: 30px;">
                     <h3>Saved Recipes</h3>
                     <table id="saved-recipes-table">
@@ -178,7 +190,6 @@
                             </tr>
                         </thead>
                         <tbody id="saved-recipes-tbody">
-                            <!-- Populated by JS -->
                         </tbody>
                     </table>
                 </section>
@@ -204,8 +215,8 @@
                         <thead>
                             <tr>
                                 <th>Ingredient</th>
-                                <th>Grams Used</th>
-                                <th>Cost ($/G)</th>
+                                <th>Qty Used</th>
+                                <th>Cost ($/Unit)</th>
                                 <th>Line Cost</th>
                                 <th>Action</th>
                             </tr>
@@ -246,7 +257,6 @@
             <!-- MARKETS VIEW -->
             <section id="markets-view" class="view hidden">
                 <h2>Event Ledger & Profitability</h2>
-                
                 <section class="form-section">
                     <div class="event-header-grid">
                         <div class="form-group">
@@ -292,6 +302,7 @@
     </div>
 
     <script src="/js/app.js"></script>
+    <script src="/js/receipts.js"></script>
     <script src="/js/ingredients.js"></script>
     <script src="/js/expenses.js"></script>
     <script src="/js/recipes.js"></script>

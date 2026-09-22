@@ -3,12 +3,6 @@ let globalCatalog = [];
 let savedRecipes = [];
 let editingRecipeId = null;
 
-// Listen for updates from ingredients.js so dropdowns stay accurate
-window.addEventListener('catalogUpdated', (e) => {
-    globalCatalog = e.detail;
-    renderRecipeTable(); // Recalculate existing rows immediately if prices changed
-});
-
 document.addEventListener('DOMContentLoaded', () => {
     const tbody = document.getElementById('recipe-tbody');
     const savedRecipesTbody = document.getElementById('saved-recipes-tbody');
@@ -16,7 +10,12 @@ document.addEventListener('DOMContentLoaded', () => {
     const saveBtn = document.getElementById('save-recipe-btn');
     const clearBtn = document.getElementById('clear-recipe-btn');
 
-    // --- 1. Fetch & Render Saved Recipes ---
+    // FIX: Listener is now safely inside DOMContentLoaded
+    window.addEventListener('catalogUpdated', (e) => {
+        globalCatalog = e.detail;
+        renderRecipeTable(); 
+    });
+
     async function fetchRecipes() {
         try {
             const response = await fetch('/api/recipes/');
@@ -51,7 +50,6 @@ document.addEventListener('DOMContentLoaded', () => {
         document.getElementById('recipe-name').value = recipe.name;
         document.getElementById('yield-qty').value = recipe.yield_qty;
         
-        // Deep copy the ingredients so we don't accidentally mutate the saved state before saving
         currentRecipeIngredients = JSON.parse(JSON.stringify(recipe.ingredients));
         renderRecipeTable();
         
@@ -67,7 +65,6 @@ document.addEventListener('DOMContentLoaded', () => {
         } catch (error) { console.error("Delete error:", error); }
     };
 
-    // --- 2. Active Recipe Editing Logic ---
     function renderRecipeTable() {
         tbody.innerHTML = '';
         let totalCost = 0;
@@ -75,26 +72,24 @@ document.addEventListener('DOMContentLoaded', () => {
         currentRecipeIngredients.forEach((ing, index) => {
             const tr = document.createElement('tr');
             
-            // Look up the exact cost from the current global catalog
             const catalogItem = globalCatalog.find(c => c.name === ing.name);
-            const costPerGram = catalogItem ? catalogItem.cost_per_gram : 0.00; 
-            const lineCost = ing.grams * costPerGram;
+            const costPerUnit = catalogItem ? catalogItem.cost_per_unit : 0.00; 
+            const measure = catalogItem ? catalogItem.unit_measure : "g";
+            const lineCost = ing.grams * costPerUnit; // 'grams' key maps to qty internally
             
             totalCost += lineCost;
 
-            // Build dynamic dropdown options based on the ingredient catalog
             let optionsHtml = '<option value="">-- Select Ingredient --</option>';
             let foundInCatalog = false;
             
             globalCatalog.forEach(catItem => {
                 const selected = (catItem.name === ing.name) ? 'selected' : '';
                 if (selected) foundInCatalog = true;
-                optionsHtml += `<option value="${catItem.name}" ${selected}>${catItem.name}</option>`;
+                optionsHtml += `<option value="${catItem.name}" ${selected}>${catItem.name} (${catItem.vendor})</option>`;
             });
 
-            // Fallback: If an ingredient is in a recipe but was deleted from the catalog
             if (ing.name && !foundInCatalog) {
-                optionsHtml += `<option value="${ing.name}" selected>${ing.name} (Missing from Catalog)</option>`;
+                optionsHtml += `<option value="${ing.name}" selected>${ing.name} (Missing)</option>`;
             }
 
             tr.innerHTML = `
@@ -104,7 +99,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     </select>
                 </td>
                 <td><input type="number" step="any" value="${ing.grams}" class="table-input" onchange="updateIngredient(${index}, 'grams', this.value)"></td>
-                <td>$${costPerGram.toFixed(4)}</td>
+                <td>$${costPerUnit.toFixed(4)} / ${measure}</td>
                 <td>$${lineCost.toFixed(2)}</td>
                 <td><button onclick="removeIngredient(${index})" class="btn-secondary" style="margin-top: 0; padding: 5px 10px;">Remove</button></td>
             `;
@@ -139,7 +134,6 @@ document.addEventListener('DOMContentLoaded', () => {
         document.getElementById('estimated-profit').innerText = `$${estimatedProfit.toFixed(2)}`;
     }
 
-    // --- 3. Form Controls ---
     addBtn.addEventListener('click', () => {
         currentRecipeIngredients.push({ name: '', grams: 0 });
         renderRecipeTable();
@@ -186,13 +180,12 @@ document.addEventListener('DOMContentLoaded', () => {
 
             if (response.ok) {
                 fetchRecipes();
-                clearBtn.click(); // Reset the form after successful save
+                clearBtn.click(); 
             } else {
                 console.error("Failed to save recipe");
             }
         } catch (error) { console.error("Connection error:", error); }
     });
 
-    // Initialize
     fetchRecipes();
 });

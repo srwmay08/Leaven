@@ -17,3 +17,6 @@ env/
 # SQLite Databases (if applicable)
 *.sqlite3
 db.sqlite3
+
+#folders
+/receipts

@@ -1,5 +1,6 @@
 from pydantic import BaseModel
 from typing import List
+from datetime import date
 
 class MarketItem(BaseModel):
     item_key: str
@@ -8,7 +9,7 @@ class MarketItem(BaseModel):
 
 class MarketEvent(BaseModel):
     event_name: str
-    event_date: str
+    event_date: date
     items: List[MarketItem]
     total_revenue: float
     total_cost: float

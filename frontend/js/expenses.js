@@ -66,4 +66,6 @@ window.deleteExpense = async (id) => {
     } catch (error) { console.error("Delete error:", error); }
 };
 
+window.addEventListener('refreshExpenses', fetchExpenses);
+
 document.addEventListener('DOMContentLoaded', fetchExpenses);

@@ -1,3 +1,4 @@
+import os
 from motor.motor_asyncio import AsyncIOMotorClient
 
 class DataBase:
@@ -6,8 +7,10 @@ class DataBase:
 db = DataBase()
 
 async def connect_to_mongo():
-    db.client = AsyncIOMotorClient("mongodb://localhost:27017")
-    print("Connected to MongoDB.")
+    # Load from environment variable, fallback to localhost for development
+    mongo_uri = os.getenv("MONGO_URI", "mongodb://localhost:27017")
+    db.client = AsyncIOMotorClient(mongo_uri)
+    print(f"Connected to MongoDB at {mongo_uri}")
 
 async def close_mongo_connection():
     if db.client is not None:
